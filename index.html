@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <style>
+    .node circle {
+      fill: #fff;
+      stroke: steelblue;
+      stroke-width: 3px;
+    }
+
+    .node text {
+      font: 12px sans-serif;
+    }
+
+    .link {
+      fill: none;
+      stroke: #ccc;
+      stroke-width: 2px;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>SQL Visualizer</h1>
+
+
+  <div>
+    <label for="sql">SQL</label><br />
+    <textarea id="sql" cols="80" rows="10">select id, name from students where age < 18</textarea>
+    <button onclick="main()">Submit</button>
+  </div>
+
+  <div>
+    <label for="ast">AST</label><br />
+    <textarea id="ast" cols="80" rows="10" readonly></textarea>
+  </div>
+
+  <div>
+    <label for="error">Error</label><br />
+    <textarea id="error" style="color: red;" cols="80" rows="10" readonly></textarea>
+  </div>
+
+  <!-- <div>
+    <label for="outputText">Hierarchy</label><br>
+    <textarea id="outputText" cols="80" rows="10" readonly></textarea>
+  </div> -->
+
+  <svg></svg>
+
+  <script src="https://unpkg.com/node-sql-parser/umd/index.umd.js"></script>
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <script src="parseSQL.js"></script>
+  <script src="convertJson.js"></script>
+  <script src="drawHierarchy.js"></script>
+  <script>
+    function main() {
+      const sql = document.getElementById('sql').value;
+
+      let ast;
+      try {
+        // 初期化
+        document.getElementById('error').textContent = '';
+        initHierarchy();
+        // SQLをparse
+        ast = parseSQL(sql);
+        document.getElementById('ast').value = JSON.stringify(ast, null, 2);
+      } catch (e) {
+        // ASTをクリア
+        document.getElementById('ast').value = '';
+        // エラーメッセージを表示
+        document.getElementById('error').textContent = e.message + ' at ' + JSON.stringify(e.location);
+        console.error(e);
+        return;
+      }
+
+      // ASTをHierarchy用のJSONに変換
+      const convertedJson = convertJson(ast);
+      // document.getElementById('outputText').value = JSON.stringify(convertedJson, null, 2);
+
+      // Hierarchyを描画
+      drawHierarchy(convertedJson);
+
+    }
+  </script>
+</body>
+
+</html>
