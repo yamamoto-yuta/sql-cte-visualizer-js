@@ -1,6 +1,6 @@
 function drawGraph(dependencies) {
     let dot = 'digraph G {';
-    dot += 'node [shape="polygon", fillcolor="green", style="filled"] ';
+    dot += 'node [shape="polygon", fillcolor="green", style="filled", fontname="Courier New"] ';
 
     for (const [name, refs] of Object.entries(dependencies)) {
         if (name === "main") {
