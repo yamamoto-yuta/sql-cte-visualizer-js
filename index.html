@@ -12,8 +12,12 @@
   <script src="drawGraph.js" defer></script>
   <script>
     function processSqlScript() {
-      let queryScript = document.getElementById('sqlScript').value;
+      const queryScript = document.getElementById('sqlScript').value;
+      // console.log(queryScript);
+
       const parsedQuery = parseSQLQuery(queryScript);
+      // console.log(parsedQuery);
+
       drawGraph(parsedQuery["dependencies"]);
     }
   </script>
