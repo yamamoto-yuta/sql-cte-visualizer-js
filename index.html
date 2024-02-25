@@ -39,15 +39,19 @@
     <textarea id="sqlScript" rows="20" cols="100" placeholder="Enter SQL script.">
 WITH
 
-  cte_depth_2 AS (
-    SELECT * FROM source
+  cte1 AS (
+    SELECT * FROM source1
   ),
 
-  cte_depth_1 AS (
-    SELECT * FROM cte_depth_2
+  cte2 AS (
+    SELECT * FROM source1
+  ),
+
+  cte3 AS (
+    SELECT * FROM cte2
   )
 
-SELECT * FROM cte_depth_1
+SELECT * FROM cte3 JOIN cte1
   </textarea>
     <button onclick="processSqlScript()">可視化</button>
   </div>
