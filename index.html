@@ -2,88 +2,44 @@
 <html>
 
 <head>
-  <meta charset="utf-8">
-  <style>
-    .node circle {
-      fill: #fff;
-      stroke: steelblue;
-      stroke-width: 3px;
-    }
+  <title>SQL Script DAG Visualization</title>
 
-    .node text {
-      font: 12px sans-serif;
-    }
+  <script src="//d3js.org/d3.v4.min.js"></script>
+  <script src="https://unpkg.com/viz.js@1.8.1/viz.js" type="javascript/worker"></script>
+  <script src="https://unpkg.com/d3-graphviz@2.6.1/build/d3-graphviz.js"></script>
 
-    .link {
-      fill: none;
-      stroke: #ccc;
-      stroke-width: 2px;
+  <script src="parseSQLQuery.js"></script>
+  <script src="drawGraph.js" defer></script>
+  <script>
+    function processSqlScript() {
+      let queryScript = document.getElementById('sqlScript').value;
+      const parsedQuery = parseSQLQuery(queryScript);
+      drawGraph(parsedQuery["dependencies"]);
     }
-  </style>
+  </script>
 </head>
 
 <body>
-  <h1>SQL Visualizer</h1>
-
-
-  <div>
-    <label for="sql">SQL</label><br />
-    <textarea id="sql" cols="80" rows="10">select id, name from students where age < 18</textarea>
-    <button onclick="main()">Submit</button>
-  </div>
+  <h1>SQLのCTEを可視化するツール</h1>
 
   <div>
-    <label for="ast">AST</label><br />
-    <textarea id="ast" cols="80" rows="10" readonly></textarea>
+    <textarea id="sqlScript" rows="20" cols="100" placeholder="Enter SQL script.">
+WITH
+
+  cte_depth_2 AS (
+    SELECT * FROM source
+  ),
+
+  cte_depth_1 AS (
+    SELECT * FROM cte_depth_2
+  )
+
+SELECT * FROM cte_depth_1
+  </textarea>
+    <button onclick="processSqlScript()">可視化</button>
   </div>
 
-  <div>
-    <label for="error">Error</label><br />
-    <textarea id="error" style="color: red;" cols="80" rows="10" readonly></textarea>
-  </div>
-
-  <!-- <div>
-    <label for="outputText">Hierarchy</label><br>
-    <textarea id="outputText" cols="80" rows="10" readonly></textarea>
-  </div> -->
-
-  <svg></svg>
-
-  <script src="https://unpkg.com/node-sql-parser/umd/index.umd.js"></script>
-  <script src="https://d3js.org/d3.v5.min.js"></script>
-  <script src="parseSQL.js"></script>
-  <script src="convertJson.js"></script>
-  <script src="drawHierarchy.js"></script>
-  <script>
-    function main() {
-      const sql = document.getElementById('sql').value;
-
-      let ast;
-      try {
-        // 初期化
-        document.getElementById('error').textContent = '';
-        initHierarchy();
-        // SQLをparse
-        ast = parseSQL(sql);
-        document.getElementById('ast').value = JSON.stringify(ast, null, 2);
-      } catch (e) {
-        // ASTをクリア
-        document.getElementById('ast').value = '';
-        // エラーメッセージを表示
-        document.getElementById('error').textContent = e.message + ' at ' + JSON.stringify(e.location);
-        console.error(e);
-        return;
-      }
-
-      // ASTをHierarchy用のJSONに変換
-      const convertedJson = convertJson(ast);
-      // document.getElementById('outputText').value = JSON.stringify(convertedJson, null, 2);
-
-      // Hierarchyを描画
-      drawHierarchy(convertedJson);
-
-    }
-  </script>
+  <div id="graphContainer"></div>
 </body>
 
 </html>
